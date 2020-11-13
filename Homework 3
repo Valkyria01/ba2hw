@@ -1,1 +1,41 @@
 ##Homework 3 code here
+library(readxl)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+getwd()
+
+
+#Create a bar chart showing the number of stores in the different provinces. 
+#Add the percentage share (with 0 decimal places) of each province on the total number of stores on the top of the column,
+#name the axes and save the bar chart.
+
+#Load provinces:
+Burgenland_Stores <- read.csv("Burgenland.csv", sep = "\t")
+Carinthia_Stores <- read.csv("Carinthia.csv", sep = "\t")
+Lower_Austria_Stores <- read.csv("Lower_Austria.csv", sep = "\t")
+Salzburg_Stores <- read.csv("Salzburg.csv", sep = "\t")
+Styria_Stores <- read.csv("Styria.csv", sep = "\t")
+Tyrol_Stores <- read.csv("Tyrol.csv", sep = "\t")
+Upper_Austria_Stores <- read.csv("Upper_Austria.csv", sep = "\t")
+Vienna_Stores <- read.csv("Vienna.csv", sep = "\t")
+Vorarlberg_Stores <- read.csv("Vorarlberg.csv", sep = "\t")
+
+#Get number of stores
+Burgenland <- nrow(Burgenland_Stores)
+Carinthia <- nrow (Carinthia_Stores)
+Lower_Austria <- nrow (Lower_Austria_Stores)
+Salzburg <- nrow (Salzburg_Stores)
+Styria <- nrow (Styria_Stores)
+Tyrol <- nrow (Tyrol_Stores)
+Upper_Austria <- nrow (Upper_Austria_Stores)
+Vienna <- nrow (Vienna_Stores)
+Vorarlberg <- nrow (Vorarlberg_Stores)
+
+Provinces <- c(Burgenland, Carinthia, Lower_Austria, Salzburg, Styria, Tyrol, Upper_Austria, Vienna, Vorarlberg)
+Names <- c("Burgenland", "Carinthia", "Lower_Austria", "Salzburg", "Styria", "Tyrol", "Upper_Austria", "Vienna", "Vorarlberg")
+percentages <- c(Burgenland/sum(Provinces),Carinthia/sum(Provinces), Lower_Austria/sum(Provinces), Salzburg/sum(Provinces), Styria/sum(Provinces), Tyrol/sum(Provinces), Upper_Austria/sum(Provinces), Vienna/sum(Provinces), Vorarlberg/sum(Provinces))
+
+store_plot <- barplot(Provinces, ylim = c(0,100),names.arg = Names, xlab = "Provinces", ylab = "# of Stores")
+store_plot+geom_text(aes(label=sprintf("%.0f%%",percentages),vjust=-0.3))
+Fuck, doesn't workwithout ggplot2 :(

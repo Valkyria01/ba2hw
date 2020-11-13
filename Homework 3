@@ -63,4 +63,62 @@ Stores <- mutate_at(Stores, "address", as.character)
 
 #Geocode it
 geo <-geocode_OSM(Stores$address, return.first.only = TRUE)
-#364/400 only have a geocode. WHY?
+#343/400 only have a geocode. WHY?
+
+No results found for "Ruster Straße 20,7072,Mörbisch am See".
+No results found for "Untere Bahngasse 2,7083,Purbach am Neusiedler See".
+No results found for "Hauptstrasse 1,7210,Mattersburg".
+No results found for "Heiligengeistplatz 4,9020,Klagenfurt am Wörthersee".
+No results found for "Bahnhofstraße 37,9020,Klagenfurt am Wörthersee".
+No results found for "Turmgasse 24,9020,Klagenfurt am Wörthersee".
+No results found for "Wachenbuchener Straße 2,9062,Moosburg".
+No results found for "Klagenfurter Straße 9,9220,Velden am Wörther See".
+No results found for "Völkermarkter Straße 1,9300,Sankt Veit an der Glan".
+No results found for "Gendarmerieplatz 1,9470,Sankt Paul im Lavanttal".
+No results found for "Sparstraße 1,9521,Treffen am Ossiacher See".
+No results found for "Klagenfurter Straße 14,9560,Feldkirchen in Kärnten".
+No results found for "Untere Vorstadt 30,9853,Gmünd in Kärnten".
+No results found for "Wienerstraße 7,2261,Angern an der March".
+No results found for "Kasernstraße 1,2301,Groß-Enzersdorf".
+No results found for "Hauptstraße 39,2344,Maria Enzersdorf".
+No results found for "Bahnstraße 12,2351,Wiener Neudorf".
+No results found for "Hauptplatz 1,2402,Maria Ellend".
+No results found for "Landstraße 124,2410,Hainburg an der Donau".
+No results found for "Industriegelaende West 10-12,2460,Bruck an der Leitha".
+No results found for "Eisenstädter Straße 18,2491,Neufeld an der Leitha".
+No results found for "Am Stampf 18,2492,Eggendorf".
+No results found for "Hauptstraße 4,2544,Leobersdorf".
+No results found for "Manker Straße 6,3200,Ober-Grafendorf".
+No results found for "35.a Straße 1,3331,Kematen an der Ybbs".
+No results found for "Weidlinger Straße 7,3400,Klosterneuburg".
+No results found for "Hauptplatz 12,3430,Tulln an der Donau".
+No results found for "Wiener Straße 50,3500,Krems an der Donau".
+No results found for "Kastellstraße 1,3512,Mautern an der Donau".
+No results found for "Linzergasse 57,5020,Salzburg".
+No results found for "Kaigasse 30,5020,Salzburg".
+No results found for "Hauptstraße 1,5202,Neumarkt am Wallersee".
+No results found for "Gschwandnerweg 2,5340,Sankt Gilgen".
+No results found for "Obere Marktstraße 54,5541,Altenmarkt im Pongau".
+No results found for "Liechtensteinklammstraße 4,5600,Sankt Johann im Pongau".
+No results found for "Gleichenbergerstraße 1,8083,Sankt Stefan im Rosental".
+No results found for "Kapfensteiner Straße 2,8344,Bad Gleichenberg".
+No results found for "Marktstraße 8,8522,Groß Sankt Florian".
+No results found for "Hauptstraße 7,8642,Sankt Marein im Mürztal".
+No results found for "Auweg 2,8652,Kindberg".
+No results found for "Untere Hauptstraße 19,8663,Sankt Barbara im Mürztal".
+No results found for "Gabelhoferstraße 1,8750,Judenburg".
+No results found for "Salzburger Siedlung 239,8970,Schladming".
+No results found for "Tauplitz 8,8982,Bad Mitterndorf".
+No results found for "Dorfstraße 40,6212,Eben am Achensee".
+No results found for "Rohrerstraße 9,6280,Zell am Ziller".
+No results found for "Speckbacherstraße 10,6380,St. Johann in Tirol".
+No results found for "Wirtschaftszeile 2,4150,Rohrbach-Berg".
+No results found for "Reichenauer Straße 9,4203,Altenberg bei Linz".
+No results found for "Mauthausener Straße 30,4222,St. Georgen an der Gusen".
+No results found for "Hauptplatz 11,4540,Bad Hall".
+No results found for "Sengsschmiedstraße 12,4560,Kirchdorf an der Krems".
+No results found for "Gewerbepark 2,4592,Grünburg".
+No results found for "Schallerbacher Straße 7,4702,Wallern an der Trattnach".
+No results found for "Anton-Brucker-Straße 1,4863,Seewalchen am Attersee".
+No results found for "Am See Ring 1,4880,St. Georgen im Attergau".
+No results found for "Fischerstraße 13,4910,Ried im Innkreis".

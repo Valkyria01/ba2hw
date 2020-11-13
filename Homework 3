@@ -3,6 +3,11 @@ library(readxl)
 library(dplyr)
 library(stringr)
 library(ggplot2)
+library(maps)
+library(mapdata)
+library(tmaptools)
+library(raster)
+library(osrm)
 getwd()
 
 
@@ -21,21 +26,30 @@ Upper_Austria_Stores <- read.csv("Upper_Austria.csv", sep = "\t")
 Vienna_Stores <- read.csv("Vienna.csv", sep = "\t")
 Vorarlberg_Stores <- read.csv("Vorarlberg.csv", sep = "\t")
 
-#Get number of stores
-Burgenland <- nrow(Burgenland_Stores)
-Carinthia <- nrow (Carinthia_Stores)
-Lower_Austria <- nrow (Lower_Austria_Stores)
-Salzburg <- nrow (Salzburg_Stores)
-Styria <- nrow (Styria_Stores)
-Tyrol <- nrow (Tyrol_Stores)
-Upper_Austria <- nrow (Upper_Austria_Stores)
-Vienna <- nrow (Vienna_Stores)
-Vorarlberg <- nrow (Vorarlberg_Stores)
+#Put provinces into the data frames themselves
+Burgenland_Stores <- mutate(Burgenland_Stores, Province = "Burgenland")
+Carinthia_Stores <- mutate(Carinthia_Stores, Province = "Carinthia")
+Lower_Austria_Stores <- mutate(Lower_Austria_Stores, Province = "Lower Austria")
+Salzburg_Stores <- mutate(Salzburg_Stores, Province = "Salzburg")
+Styria_Stores <- mutate(Styria_Stores, Province = "Styria")
+Tyrol_Stores <- mutate(Tyrol_Stores, Province = "Tyrol")
+Upper_Austria_Stores <- mutate(Upper_Austria_Stores, Province = "Upper Austria")
+Vienna_Stores <- mutate(Vienna_Stores, Province = "Vienna")
+Vorarlberg_Stores <- mutate(Vorarlberg_Stores, Province = "Vorarlberg")
 
-Provinces <- c(Burgenland, Carinthia, Lower_Austria, Salzburg, Styria, Tyrol, Upper_Austria, Vienna, Vorarlberg)
-Names <- c("Burgenland", "Carinthia", "Lower_Austria", "Salzburg", "Styria", "Tyrol", "Upper_Austria", "Vienna", "Vorarlberg")
-percentages <- c(Burgenland/sum(Provinces),Carinthia/sum(Provinces), Lower_Austria/sum(Provinces), Salzburg/sum(Provinces), Styria/sum(Provinces), Tyrol/sum(Provinces), Upper_Austria/sum(Provinces), Vienna/sum(Provinces), Vorarlberg/sum(Provinces))
+#Combine and group
+Stores <- rbind(Burgenland_Stores, Carinthia_Stores, Lower_Austria_Stores, Salzburg_Stores, Styria_Stores, Tyrol_Stores, Upper_Austria_Stores, Vienna_Stores, Vorarlberg_Stores)
+Stores <- mutate_at(Stores, "Province", as.factor)
+Stores <- group_by(Stores, Province)
+prov_sum <- summarise(Stores, n_Stores=n())
+prov_sum
 
-store_plot <- barplot(Provinces, ylim = c(0,100),names.arg = Names, xlab = "Provinces", ylab = "# of Stores")
-store_plot+geom_text(aes(label=sprintf("%.0f%%",percentages),vjust=-0.3))
-Fuck, doesn't workwithout ggplot2 :(
+#Make plot
+province_plot <- ggplot(prov_sum, aes(x = Province, y = n_Stores))
+province_plot+geom_col(fill = "blue")+geom_text(aes(label=sprintf("%.0f%%",n_Stores/sum(n_Stores)*100),vjust=-0.3))+labs(x="Province",y="Number of Stores")
+
+#Save the plot
+ggsave("Stores.jpeg",height=7,width=7)
+
+
+#Find the geocoordinates of all stores and store them in the .csv files with stores for each province

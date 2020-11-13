@@ -53,3 +53,14 @@ ggsave("Stores.jpeg",height=7,width=7)
 
 
 #Find the geocoordinates of all stores and store them in the .csv files with stores for each province
+
+#Make the address column
+Stores$adress1 <- paste(Stores$street, Stores$house.number, sep = " ")
+Stores$adress2 <- paste(Stores$postcode, Stores$city, sep = ",")
+Stores <- transform(Stores, address=paste(adress1, adress2, sep=","))
+Stores <- subset(Stores, select = -c(adress1, adress2) )
+Stores <- mutate_at(Stores, "address", as.character)
+
+#Geocode it
+geo <-geocode_OSM(Stores$address, return.first.only = TRUE)
+#364/400 only have a geocode. WHY?

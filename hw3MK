@@ -1,0 +1,251 @@
+library(readxl)
+library(dplyr)
+library(stringr)
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(maps)
+library(mapdata)
+library(tmaptools)
+library(raster)
+library(osrm)
+
+allowed_links<-data.frame(read_excel("Allowed_links.xlsx"))
+intermediate_nodes<-data.frame(read_excel("Intermediate_nodes.xlsx"))
+list_stores<-data.frame(read_excel("List_stores.xlsx"))
+warehouses<-data.frame(read_excel("Warehouses.xlsx"))
+warehouse_capacities<-read.table("Warehouse_capacities.txt", sep="\t", header=TRUE)
+
+
+
+list_stores <- mutate_at(list_stores, "Store.no.", as.integer)
+list_stores<-mutate_at(list_stores,"postcode",str_remove_all, pattern="[ZIP]")
+list_stores<-mutate_at(list_stores,"postcode",str_remove_all, pattern="[L]")
+list_stores<-mutate_at(list_stores,"postcode",str_remove_all, pattern=fixed("\""))
+list_stores<-mutate_at(list_stores,"postcode",str_remove_all, pattern=",00")
+list_stores <- mutate_at(list_stores, "postcode", as.integer)
+warehouses <- mutate_at(warehouses, "Warehouse.no.", as.integer)
+warehouses <- mutate_at(warehouses, "postcode", as.integer)
+warehouse_capacities<-mutate_at(warehouse_capacities,"warehouse",as.character)
+
+list_stores2<-data.frame(read_excel("List_stores_modified.xlsx"))
+View(list_stores2)
+
+#1)
+
+#from previous task
+Vienna<-read.csv("Vienna.csv",sep=";",header=TRUE)
+Lower_Austria<-read.csv("Lower_Austria.csv",sep=";",header=TRUE)
+Upper_Austria<-read.csv("Upper_Austria.csv",sep=";",header=TRUE)
+Salzburg<-read.csv("Salzburg.csv",sep=";",header=TRUE)
+Tyrol<-read.csv("Tyrol.csv",sep=";",header=TRUE)
+Vorarlberg<-read.csv("Vorarlberg.csv",sep=";",header=TRUE)
+Burgenland<-read.csv("Burgenland.csv",sep = ";",header=TRUE)
+Styria<-read.csv("Styria.csv",sep = ";",header=TRUE)
+Carinthia<-read.csv("Carinthia.csv",sep = ";",header=TRUE)
+
+View(Vienna)
+View(Lower_Austria)
+storesV<-nrow(Vienna)
+storesLA<-nrow(Lower_Austria)
+storesUA<-nrow(Upper_Austria)
+storesSB<-nrow(Salzburg)
+storesTy<-nrow(Tyrol)
+storesVB<-nrow(Vorarlberg)
+storesB<-nrow(Burgenland)
+storesST<-nrow(Styria)
+storesCA<-nrow(Carinthia)
+
+city_stores<-c("Vienna","LowerAustria","UpperAustria","Salzburg","Tyrol","Vorarlberg","Burgenland","Styria","Carinthia")
+store_numbers<-c(storesV,storesLA,storesUA,storesSB,storesTy,storesVB,storesB,storesST,storesCA)
+cities_store_numbers<-data.frame(city_stores,store_numbers)
+cities_store_numbers
+
+city_stores<-ggplot(cities_store_numbers,aes(x=city_stores,store_numbers))
+city_stores+geom_col(fill='pink')+geom_text(aes(label=sprintf("%.0f%%",store_numbers/sum(store_numbers)*100),vjust=-0.2))+theme(axis.text.x=element_text(angle=45)) + labs(x="Provinces", y="Store percentage")
+
+ggsave("NumberOfStores.jpg", height=7, width=7)
+
+
+
+#2)
+View(list_stores)
+x<-unlist(list_stores)
+city<-list_stores$city
+street<-list_stores$street
+house<-list_stores$house.number
+address<-paste(street,house,sep=" ")
+address2<-paste(address,city,sep=", ")
+
+geocoded_addresses<-geocode_OSM(addressnew,return.first.only = TRUE) 
+geocoded_addresses
+
+map('world','Austria')
+points(geocoded_addresses$lon,geocoded_addresses$lat,pch=21,cex=0.8,col="blue")
+new_table<-left_join(geocoded_addresses,list_stores)
+View(new_table)
+
+city<-list_stores2$city
+street<-list_stores2$street
+house<-list_stores2$house.number
+address<-paste(street,house,sep=" ")
+addressnew<-paste(address,city,sep=", ")
+address_data<-data.frame(list_stores2,geocoded_addresses)
+View(address_data)
+
+address_data <- address_data %>%
+  mutate_at(vars(lat:lon_max), str_replace_all, pattern = "51.80238",replacement = "kA")
+address_data <- address_data %>%
+  mutate_at(vars(lat:lon_max), str_replace_all, pattern = "7.5367638",replacement = "kA")
+
+                                                    
+
+address_data <- address_data %>%
+  mutate_at(vars(lat:lon_max), str_replace_all, pattern ="51.8021531" ,replacement = "kA")  
+address_data <- address_data %>%
+  mutate_at(vars(lat:lon_max), str_replace_all, pattern = "51.8028149",replacement = "kA")
+address_data <- address_data %>%
+  mutate_at(vars(lat:lon_max), str_replace_all, pattern = "7.5357942",replacement = "kA")                                                            
+address_data_final <- address_data %>%
+  mutate_at(vars(lat:lon_max), str_replace_all, pattern = "7.5382551",replacement = "kA")
+
+
+
+
+7.5382551
+
+View(address_data_final)
+
+                                                         
+allowed_links <- allowed_links %>%
+  mutate_at(vars(Bregenz:St..Veit.an.der.Glan), str_replace_all, pattern = "highway", replacement = "1") 
+allowed_links <- allowed_links %>%
+  mutate_at(vars(Bregenz:St..Veit.an.der.Glan), str_replace_all, pattern = "country road", replacement = "2") 
+
+
+51.80238
+7.536764
+51.80215
+51.80281
+7.535794
+7.53825
+
+#3)
+map('world','Austria')
+Vienna_address <- filter(address_data_final, postcode<2000)
+Lower_Austria_address<-filter(address_data_final, postcode<4000 & postcode>=2000)
+Upper_Austria_address<-filter(address_data_final,postcode<5000 & postcode>=4000)
+Salzburg_address<-filter(address_data_final,postcode<6000 & postcode>=5000)
+Tyrol_address<-filter(address_data_final,postcode<6700 & postcode >=6000 | postcode>=9900)
+Vorarlberg_address<-filter(address_data_final,postcode<7000 & postcode>=6700)
+Burgenland_address<-filter(address_data_final,postcode<8000 & postcode>=7000)
+Styria_address<-filter(address_data_final,postcode<9000 & postcode>=8000)
+Carinthia_address<-filter(address_data_final,postcode<9900 & postcode>=9000)
+
+points(Vienna_address$lon,Vienna_address$lat,pch=21,cex=0.8,col="light blue")
+points(Lower_Austria_address$lon,Lower_Austria_address$lat,pch=21,cex=0.8,col="light green")
+points(Upper_Austria_address$lon,Upper_Austria_address$lat,pch=21,cex=0.8,col="yellow")
+points(Salzburg_address$lon, Salzburg_address$lat,pch=21,cex=0.8,col="orange")
+points(Tyrol_address$lon, Tyrol_address$lat,pch=21,cex=0.8,col="purple")
+points(Vorarlberg_address$lon, Vorarlberg_address$lat,pch=21,cex=0.8,col="pink")
+points(Burgenland_address$lon, Burgenland_address$lat,pch=21,cex=0.8,col="grey")
+points(Styria_address$lon, Styria_address$lat,pch=21,cex=0.8,col="dark blue")
+points(Carinthia_address$lon, Carinthia_address$lat,pch=21,cex=0.8,col="dark green")
+
+#4)
+central<-data.frame(read.csv("combined_warehouses.csv",sep="\t",header=TRUE))
+regional<-data.frame(read.csv("combined_warehouses_regional.csv",sep="\t",header=TRUE))
+View(warehouses)
+city<-warehouses$city
+street<-warehouses$street
+house<-warehouses$house.number
+address<-paste(street,house,sep=" ")
+address2<-paste(address,city,sep=", ")
+geocoded_addresses<-geocode_OSM(address2,return.first.only = TRUE) 
+View(geocoded_addresses)
+
+mutate_at(central,"city",as.character)
+mutate_at(geocoded_addresses,"query",as.character)
+combination<-merge(filter(central$city==geocoded_addresses$query))
+
+central_address<-geocoded_addresses[1:3,2:3]
+
+combined_warehouses_addresses<-cbind(central_address,central)
+
+View(combined_warehouses_addresses)
+
+View(regional)
+
+regional_address<-geocoded_addresses[1:9,2:3]
+regional_address
+combined_warehouses_regional_address<-cbind(regional_address,regional)
+View(combined_warehouses_regional_address)
+write.table(combined_warehouses_addresses,"combined_warehouses_addresses.csv",row.names = FALSE,sep = "\t")
+
+write.table(combined_warehouses_regional_address,"combined_warehouses_regional_addresses.csv",row.names = FALSE,sep = "\t")
+
+
+
+#5)
+long<-c(combined_warehouses_addresses$lon)
+lat<-c(combined_warehouses_addresses$lat)
+points(long,lat)
+
+long<-c(combined_warehouses_regional_address$lon)
+lat<-c(combined_warehouses_regional_address$lat)
+points(long,lat)
+
+View(combined_warehouses_regional_address)
+map('world', 'Austria')
+points(combined_warehouses_addresses$lon,combined_warehouses_addresses$lat,pch=17,cex=0,2,col="blue")
+points(combined_warehouses_regional_address$lon,combined_warehouses_regional_address$lat,pch=21,cex=1,col="red")
+text(combined_warehouses_addresses$lon, combined_warehouses_addresses$lat, labels=combined_warehouses_addresses$city,pos=1)
+text(combined_warehouses_regional_addresses$lon, combined_warehouses_regional_addresses$lat, labels=combined_warehouses_regional_addresses$city,pos=1)
+legend("topleft", legend=c("Warehouse cities", "Regional warehouse cities"),pch=c(17,21),col=c("blue", "red"))
+
+
+
+#6) 
+intermediate_nodes<-data.frame(read_excel("Intermediate_nodes.xlsx"))
+View(intermediate_nodes)
+View(geocoded_addresses) #from part 4 - geocoded all warehouses
+
+#deselecting columns so i can only leave the lat and lon and the address and adding the city only
+geocoded_addresses<-subset(geocoded_addresses,select=-lat_min)
+geocoded_addresses<-subset(geocoded_addresses,select=-lat_max)
+geocoded_addresses<-subset(geocoded_addresses,select=-lon_min)
+geocoded_addresses<-subset(geocoded_addresses,select=-lon_max)
+geocoded_addresses<-rename(geocoded_addresses,latitude=lat)
+geocoded_addresses<-rename(geocoded_addresses,longitude=lon)
+geocoded_addresses<-rename(geocoded_addresses,Routing.point=query)
+geocoded_addresses$Routing.point <- warehouses$city
+
+View(geocoded_addresses)
+
+allnodes <- rbind(intermediate_nodes, geocoded_addresses) #binding them by rows
+View(allnodes)
+
+alldistances <- data.frame(matrix(ncol=nrow(allnodes)+1, nrow=nrow(allnodes)))  
+alldistances
+colnames(alldistances)<-c("Routing.point",allnodes$Routing.point)
+alldistances$Routing.point<-allnodes$Routing.point
+alldistances
+
+for(i in 1:nrow(allnodes)){
+  for(j in i:nrow(allnodes)){
+    alldistances[i,j+1]<-pointDistance(c(allnodes$longitude[i], allnodes$latitude[i]),c(allnodes$longitude[j],allnodes$latitude[j]),lonlat=TRUE)/1000
+    alldistances[j,i+1]<-pointDistance(c(allnodes$longitude[i], allnodes$latitude[i]),c(allnodes$longitude[j],allnodes$latitude[j]),lonlat=TRUE)/1000
+  }
+}  
+alldistances 
+
+write.table(alldistances,"alldistances.csv",row.names = FALSE,sep = "\t")
+
+
+#Part 7 visualizing all routes
+map('world', 'Austria')
+
+
+
+
+  
